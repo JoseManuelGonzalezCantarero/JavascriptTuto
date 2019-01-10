@@ -26,7 +26,7 @@
                         <td>{{ repLog.reps }}</td>
                         <td>{{ repLog.totalWeightLifted }}</td>
                         <td>
-                            &nbsp;
+                            <a href="#" class="js-delete-rep-log"><span class="fa fa-trash"></span></a>
                         </td>
                     </tr>
                 {% else %}
@@ -40,7 +40,9 @@
                         <td>&nbsp;</td>
                         <th>Total</th>
                         <th>{{ totalWeight }}</th>
-                        <td>&nbsp;</td>
+                        <td>
+                            &nbsp;
+                        </td>
                     </tr>
                 </tfoot>
             </table>
@@ -59,4 +61,13 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $('.js-delete-rep-log').on('click', function() {
+            console.log('todo delete!');
+        });
+    </script>
 {% endblock %}
