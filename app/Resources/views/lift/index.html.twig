@@ -68,10 +68,20 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        $(document).ready(function () {
-            var $table = $('.js-rep-log-table');
+        var RepLogApp = {
+            initialize: function ($wrapper) {
+                this.$wrapper = $wrapper;
 
-            $table.find('.js-delete-rep-log').on('click', function(e) {
+                this.$wrapper.find('.js-delete-rep-log').on(
+                    'click',
+                    this.handleRepLogDelete
+                );
+                this.$wrapper.find('tbody tr').on(
+                    'click',
+                    this.handleRowClick
+                );
+            },
+            handleRepLogDelete: function (e) {
                 e.preventDefault();
 
                 $(this).addClass('text-danger');
@@ -82,7 +92,7 @@
 
                 var deleteUrl = $(this).data('url');
                 var $row = $(this).closest('tr');
-                var $totalWeightContainer = $table.find('.js-total-weight');
+                var $totalWeightContainer = this.$wrapper.find('.js-total-weight');
                 var newWeight = $totalWeightContainer.html() - $row.data('weight');
 
                 $.ajax({
@@ -93,11 +103,15 @@
                         $totalWeightContainer.html(newWeight);
                     }
                 });
-            });
-
-            $table.find('tbody tr').on('click', function () {
+            },
+            handleRowClick: function () {
                 console.log('row clicked!');
-            });
+            }
+        };
+
+        $(document).ready(function () {
+            var $table = $('.js-rep-log-table');
+            RepLogApp.initialize($table);
         });
     </script>
 {% endblock %}
