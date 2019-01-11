@@ -80,6 +80,12 @@
                     'click',
                     this.handleRowClick
                 );
+                var newThis = {cat: 'meow', dog: 'woof'};
+                this.whatIsThis.call(newThis, 'hello');
+                this.whatIsThis('hello');
+            },
+            whatIsThis: function(greeting) {
+                console.log(this, greeting)
             },
             updateTotalWeightLifted: function() {
                 var totalWeight = 0;
@@ -106,7 +112,7 @@
                     method: 'DELETE',
                     success: function () {
                         $row.fadeOut('normal', function () {
-                            $row.remove();
+                            $(this).remove();
                             RepLogApp.updateTotalWeightLifted();
                         });
                     }
