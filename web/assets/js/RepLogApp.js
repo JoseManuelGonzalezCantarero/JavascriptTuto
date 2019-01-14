@@ -4,7 +4,7 @@
     window.RepLogApp = {
         initialize: function ($wrapper) {
             this.$wrapper = $wrapper;
-            Helper.initialize(this.$wrapper);
+            this.helper = new Helper(this.$wrapper);
             this.$wrapper.find('.js-delete-rep-log').on(
                 'click',
                 this.handleRepLogDelete.bind(this)
@@ -16,7 +16,7 @@
         },
         updateTotalWeightLifted: function () {
             this.$wrapper.find('.js-total-weight').html(
-                Helper.calculateTotalWeight()
+                this.helper.calculateTotalWeight()
             );
         },
         handleRepLogDelete: function (e) {
@@ -49,17 +49,14 @@
     /**
      * A "private" object
      */
-     var Helper = {
-        initialize: function ($wrapper) {
-            this.$wrapper = $wrapper;
-        },
-        calculateTotalWeight: function () {
-            var totalWeight = 0;
-            this.$wrapper.find('tbody tr').each(function () {
-                totalWeight += $(this).data('weight');
-            });
-
-            return totalWeight;
-        }
+     var Helper = function($wrapper) {
+        this.$wrapper = $wrapper;
+     };
+    Helper.calculateTotalWeight = function() {
+        var totalWeight = 0;
+        this.$wrapper.find('tbody tr').each(function () {
+            totalWeight += $(this).data('weight');
+        });
+        return totalWeight;
     };
 })(window, jQuery);
