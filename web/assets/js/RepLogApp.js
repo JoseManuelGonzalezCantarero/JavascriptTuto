@@ -1,19 +1,20 @@
 'use strict';
 
 (function (window, $) {
-    window.RepLogApp = {
-        initialize: function ($wrapper) {
-            this.$wrapper = $wrapper;
-            this.helper = new Helper(this.$wrapper);
-            this.$wrapper.find('.js-delete-rep-log').on(
-                'click',
-                this.handleRepLogDelete.bind(this)
-            );
-            this.$wrapper.find('tbody tr').on(
-                'click',
-                this.handleRowClick.bind(this)
-            );
-        },
+    window.RepLogApp = function($wrapper) {
+        this.$wrapper = $wrapper;
+        this.helper = new Helper(this.$wrapper);
+        this.$wrapper.find('.js-delete-rep-log').on(
+            'click',
+            this.handleRepLogDelete.bind(this)
+        );
+        this.$wrapper.find('tbody tr').on(
+            'click',
+            this.handleRowClick.bind(this)
+        );
+    };
+
+    $.extend(window.RepLogApp.prototype, {
         updateTotalWeightLifted: function () {
             this.$wrapper.find('.js-total-weight').html(
                 this.helper.calculateTotalWeight()
@@ -44,7 +45,7 @@
         handleRowClick: function () {
             console.log('row clicked!');
         }
-    };
+    });
 
     /**
      * A "private" object
@@ -53,11 +54,14 @@
         this.$wrapper = $wrapper;
      };
 
-     Helper.prototype.calculateTotalWeight = function() {
-         var totalWeight = 0;
-         this.$wrapper.find('tbody tr').each(function () {
-             totalWeight += $(this).data('weight');
-         });
-         return totalWeight;
-     };
+     $.extend(Helper.prototype, {
+         calculateTotalWeight: function() {
+             var totalWeight = 0;
+             this.$wrapper.find('tbody tr').each(function () {
+                 totalWeight += $(this).data('weight');
+             });
+             return totalWeight;
+         }
+     });
+
 })(window, jQuery);
