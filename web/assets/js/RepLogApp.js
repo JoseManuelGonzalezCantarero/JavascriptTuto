@@ -108,7 +108,13 @@
             $form[0].reset();
         },
         _addRow: function (repLog) {
-            console.log(repLog);
+            var tplText = $('#js-rep-log-row-template').html();
+            var tpl = _.template(tplText);
+
+            var html = tpl(repLog);
+            this.$wrapper.find('tbody').append($.parseHTML(html));
+
+            this.updateTotalWeightLifted();
         }
     });
 
