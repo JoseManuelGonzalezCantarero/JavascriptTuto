@@ -81,8 +81,13 @@
                 self._clearForm();
                 self._addRow(data);
             }).catch(function (jqXHR) {
+                if (typeof jqXHR.responseText === 'undefined') {
+                    throw jqXHR;
+                }
                 var errorData = JSON.parse(jqXHR.responseText);
                 self._mapErrorsToForm(errorData.errors);
+            }).catch(function (e) {
+                console.log(e);
             });
         },
         _mapErrorsToForm: function (errorData) {
