@@ -1,6 +1,6 @@
 'use strict';
 
-(function (window, $, Routing) {
+(function (window, $, Routing, swal) {
     window.RepLogApp = function($wrapper) {
         this.$wrapper = $wrapper;
         this.helper = new Helper(this.$wrapper);
@@ -46,22 +46,15 @@
         handleRepLogDelete: function (e) {
             e.preventDefault();
             var $link = $(e.currentTarget);
-            $link.addClass('text-danger');
-            $link.find('.fa')
-                .removeClass('fa-trash')
-                .addClass('fa-spinner')
-                .addClass('fa-spin');
-            var deleteUrl = $link.data('url');
-            var $row = $link.closest('tr');
             var self = this;
-            $.ajax({
-                url: deleteUrl,
-                method: 'DELETE'
+            swal({
+                title: 'Delete this log?',
+                text: 'What? Did you not actually lift this?',
+                showCancelButton: true
             }).then(function () {
-                $row.fadeOut('normal', function () {
-                    $(this).remove();
-                    self.updateTotalWeightLifted();
-                });
+                self._deleteRepLog($link);
+            }).catch(function(arg) {
+                console.log('canceled', arg);
             });
         },
         handleRowClick: function () {
@@ -76,16 +69,18 @@
                 formData[fieldData.name] = fieldData.value
             });
             var self = this;
+            console.log('entra');
             this._saveRepLog(formData)
             .then(function (data) {
+                console.log('entr3');
                 self._clearForm();
                 self._addRow(data);
             }).catch(function (errorData) {
+                console.log('entra2');
                 self._mapErrorsToForm(errorData.errors);
             });
         },
         _mapErrorsToForm: function (errorData) {
-            this._removeFormErrors();
             var $form = this.$wrapper.find(this._selectors.newRepForm);
 
             $form.find(':input').each(function () {
@@ -122,9 +117,8 @@
 
             this.updateTotalWeightLifted();
         },
-        
-        _saveRepLog: function (data) {
-            return new Promise(function (resolve, reject) {
+        _saveRepLog: function(data) {
+            return new Promise(function(resolve, reject) {
                 $.ajax({
                     url: Routing.generate('rep_log_new'),
                     method: 'POST',
@@ -132,15 +126,35 @@
                 }).then(function(data, textStatus, jqXHR) {
                     $.ajax({
                         url: jqXHR.getResponseHeader('Location')
-                    }).then(function (data) {
+                    }).then(function(data) {
                         // we're finally done!
                         resolve(data);
-                    }).catch(function (jqXHR) {
-                        var errorData = JSON.parse(jqXHR.responseText);
-                        reject(errorData);
                     });
+                }).catch(function(jqXHR) {
+                    var errorData = JSON.parse(jqXHR.responseText);
+
+                    reject(errorData);
                 });
             });
+        },
+        _deleteRepLog: function($link) {
+            $link.addClass('text-danger');
+            $link.find('.fa')
+                .removeClass('fa-trash')
+                .addClass('fa-spinner')
+                .addClass('fa-spin');
+            var deleteUrl = $link.data('url');
+            var $row = $link.closest('tr');
+            var self = this;
+            $.ajax({
+                url: deleteUrl,
+                method: 'DELETE'
+            }).then(function() {
+                $row.fadeOut('normal', function () {
+                    $(this).remove();
+                    self.updateTotalWeightLifted();
+                });
+            })
         }
     });
 
@@ -161,4 +175,4 @@
          }
      });
 
-})(window, jQuery, Routing);
+})(window, jQuery, Routing, swal);
