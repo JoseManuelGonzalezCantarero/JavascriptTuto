@@ -1,4 +1,14 @@
-const favoriteFood = 'gelato';
-const iLoveFood = `The year is ${(new Date()).getFullYear()} and my favorite food is ${favoriteFood}`;
+let foods = new WeakMap();
+foods.set(['italian'], 'gelato');
+foods.set(['mexican'], 'tortas');
+foods.set(['canadian'], 'poutine');
 
-console.log(iLoveFood);
+let southernUsStates = ['Tennessee', 'Kentucky', 'Texas'];
+foods.set(southernUsStates, 'hot chicken');
+southernUsStates = null;
+
+console.log(
+    foods.get(['italian']),
+    foods.get(southernUsStates),
+    foods.size
+);
