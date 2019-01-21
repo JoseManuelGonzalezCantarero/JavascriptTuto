@@ -1,6 +1,8 @@
 'use strict';
 
 (function (window, $, Routing, swal) {
+    let HelperInstances = new WeakMap();
+
     class RepLogApp {
         static get _selectors() {
             return {
@@ -10,7 +12,7 @@
 
         constructor($wrapper) {
             this.$wrapper = $wrapper;
-            this.helper = new Helper(this.$wrapper);
+            HelperInstances.set(this, new Helper(this.$wrapper));
 
             this.loadRepLogs();
 
@@ -43,7 +45,7 @@
 
         updateTotalWeightLifted() {
             this.$wrapper.find('.js-total-weight').html(
-                this.helper.getTotalWeightString()
+                HelperInstances.get(this).getTotalWeightString()
             );
         }
 
