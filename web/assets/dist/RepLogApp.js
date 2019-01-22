@@ -5,31 +5,29 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function (window, $, Routing, swal) {
+
     var HelperInstances = new WeakMap();
 
     var RepLogApp = function () {
-        _createClass(RepLogApp, null, [{
-            key: '_selectors',
-            get: function get() {
-                return {
-                    newRepForm: '.js-new-rep-log-form'
-                };
-            }
-        }]);
-
         function RepLogApp($wrapper) {
             _classCallCheck(this, RepLogApp);
 
             this.$wrapper = $wrapper;
-            this.repLogs = [];
+            this.repLogs = new Set();
+
             HelperInstances.set(this, new Helper(this.repLogs));
 
             this.loadRepLogs();
 
             this.$wrapper.on('click', '.js-delete-rep-log', this.handleRepLogDelete.bind(this));
-            this.$wrapper.on('click', 'tbody tr', RepLogApp.handleRowClick.bind(this));
+            this.$wrapper.on('click', 'tbody tr', this.handleRowClick.bind(this));
             this.$wrapper.on('submit', RepLogApp._selectors.newRepForm, this.handleNewFormSubmit.bind(this));
         }
+
+        /**
+         * Call like this.selectors
+         */
+
 
         _createClass(RepLogApp, [{
             key: 'loadRepLogs',
@@ -63,8 +61,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             }
                         }
                     }
-
-                    console.log(_this.repLogs, _this.repLogs.includes(data.items[0]));
                 });
             }
         }, {
@@ -78,7 +74,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _this2 = this;
 
                 e.preventDefault();
+
                 var $link = $(e.currentTarget);
+
                 swal({
                     title: 'Delete this log?',
                     text: 'What? Did you not actually lift this?',
@@ -88,18 +86,45 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         return _this2._deleteRepLog($link);
                     }
                 }).catch(function (arg) {
-                    console.log('canceled', arg);
+                    // canceling is cool!
                 });
+            }
+        }, {
+            key: '_deleteRepLog',
+            value: function _deleteRepLog($link) {
+                var _this3 = this;
+
+                $link.addClass('text-danger');
+                $link.find('.fa').removeClass('fa-trash').addClass('fa-spinner').addClass('fa-spin');
+
+                var deleteUrl = $link.data('url');
+                var $row = $link.closest('tr');
+
+                return $.ajax({
+                    url: deleteUrl,
+                    method: 'DELETE'
+                }).then(function () {
+                    $row.fadeOut('normal', function () {
+                        $row.remove();
+                        _this3.updateTotalWeightLifted();
+                    });
+                });
+            }
+        }, {
+            key: 'handleRowClick',
+            value: function handleRowClick() {
+                console.log('row clicked!');
             }
         }, {
             key: 'handleNewFormSubmit',
             value: function handleNewFormSubmit(e) {
-                var _this3 = this;
+                var _this4 = this;
 
                 e.preventDefault();
 
                 var $form = $(e.currentTarget);
                 var formData = {};
+
                 var _iteratorNormalCompletion2 = true;
                 var _didIteratorError2 = false;
                 var _iteratorError2 = undefined;
@@ -126,15 +151,40 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
 
                 this._saveRepLog(formData).then(function (data) {
-                    _this3._clearForm();
-                    _this3._addRow(data);
+                    _this4._clearForm();
+                    _this4._addRow(data);
                 }).catch(function (errorData) {
-                    _this3._mapErrorsToForm(errorData.errors);
+                    _this4._mapErrorsToForm(errorData.errors);
+                });
+            }
+        }, {
+            key: '_saveRepLog',
+            value: function _saveRepLog(data) {
+                return new Promise(function (resolve, reject) {
+                    var url = Routing.generate('rep_log_new');
+
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: JSON.stringify(data)
+                    }).then(function (data, textStatus, jqXHR) {
+                        $.ajax({
+                            url: jqXHR.getResponseHeader('Location')
+                        }).then(function (data) {
+                            // we're finally done!
+                            resolve(data);
+                        });
+                    }).catch(function (jqXHR) {
+                        var errorData = JSON.parse(jqXHR.responseText);
+
+                        reject(errorData);
+                    });
                 });
             }
         }, {
             key: '_mapErrorsToForm',
             value: function _mapErrorsToForm(errorData) {
+                this._removeFormErrors();
                 var $form = this.$wrapper.find(RepLogApp._selectors.newRepForm);
 
                 var _iteratorNormalCompletion3 = true;
@@ -190,67 +240,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: '_addRow',
             value: function _addRow(repLog) {
+                this.repLogs.add(repLog);
+                // destructuring example
                 // let {id, itemLabel, reps, totallyMadeUpKey = 'whatever!'} = repLog;
                 // console.log(id, itemLabel, reps, totallyMadeUpKey);
-                this.repLogs.push(repLog);
 
                 var html = rowTemplate(repLog);
-                var $row = $($.parseHTML(html));
-                // store the repLogs index
-                $row.data('key', this.repLogs.length - 1);
-                this.$wrapper.find('tbody').append($row);
+                this.$wrapper.find('tbody').append($.parseHTML(html));
 
                 this.updateTotalWeightLifted();
             }
-        }, {
-            key: '_saveRepLog',
-            value: function _saveRepLog(data) {
-                return new Promise(function (resolve, reject) {
-                    var url = Routing.generate('rep_log_new');
-                    $.ajax({
-                        url: url,
-                        method: 'POST',
-                        data: JSON.stringify(data)
-                    }).then(function (data, textStatus, jqXHR) {
-                        $.ajax({
-                            url: jqXHR.getResponseHeader('Location')
-                        }).then(function (data) {
-                            // we're finally done!
-                            resolve(data);
-                        });
-                    }).catch(function (jqXHR) {
-                        var errorData = JSON.parse(jqXHR.responseText);
-
-                        reject(errorData);
-                    });
-                });
-            }
-        }, {
-            key: '_deleteRepLog',
-            value: function _deleteRepLog($link) {
-                var _this4 = this;
-
-                $link.addClass('text-danger');
-                $link.find('.fa').removeClass('fa-trash').addClass('fa-spinner').addClass('fa-spin');
-                var deleteUrl = $link.data('url');
-                var $row = $link.closest('tr');
-                return $.ajax({
-                    url: deleteUrl,
-                    method: 'DELETE'
-                }).then(function () {
-                    $row.fadeOut('normal', function () {
-                        // we need to remove the repLog from this.repLogs
-                        // the "key" is the index to this repLog on this.repLogs
-                        _this4.repLogs.splice($row.data('key'), 1);
-                        $row.remove();
-                        _this4.updateTotalWeightLifted();
-                    });
-                });
-            }
         }], [{
-            key: 'handleRowClick',
-            value: function handleRowClick() {
-                console.log('row clicked!');
+            key: '_selectors',
+            get: function get() {
+                return {
+                    newRepForm: '.js-new-rep-log-form'
+                };
             }
         }]);
 
@@ -263,16 +268,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 
     var Helper = function () {
-        function Helper(repLogs) {
+        function Helper(repLogSet) {
             _classCallCheck(this, Helper);
 
-            this.repLogs = repLogs;
+            this.repLogSet = repLogSet;
         }
 
         _createClass(Helper, [{
             key: 'calculateTotalWeight',
             value: function calculateTotalWeight() {
-                return Helper._calculateWeights(this.repLogs);
+                return Helper._calculateWeights(this.repLogSet);
             }
         }, {
             key: 'getTotalWeightString',
@@ -289,14 +294,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         }], [{
             key: '_calculateWeights',
-            value: function _calculateWeights(repLogs) {
+            value: function _calculateWeights(repLogSet) {
                 var totalWeight = 0;
                 var _iteratorNormalCompletion4 = true;
                 var _didIteratorError4 = false;
                 var _iteratorError4 = undefined;
 
                 try {
-                    for (var _iterator4 = repLogs[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    for (var _iterator4 = repLogSet[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
                         var repLog = _step4.value;
 
                         totalWeight += repLog.totalWeightLifted;
@@ -326,5 +331,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var rowTemplate = function rowTemplate(repLog) {
         return '\n<tr data-weight="' + repLog.totalWeightLifted + '">\n    <td>' + repLog.itemLabel + '</td>\n    <td>' + repLog.reps + '</td>\n    <td>' + repLog.totalWeightLifted + '</td>\n    <td>\n        <a href="#"\n           class="js-delete-rep-log"\n           data-url="' + repLog.links._self + '"\n        >\n            <span class="fa fa-trash"></span>\n        </a>\n    </td>\n</tr>\n';
     };
+
     window.RepLogApp = RepLogApp;
 })(window, jQuery, Routing, swal);
