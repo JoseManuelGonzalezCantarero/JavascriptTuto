@@ -1,0 +1,11 @@
+{
+  "name": "javascript_tuto",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/JoseManuelGonzalezCantarero/JavascriptTuto.git",
+  "author": "Manu <jgonzalezcantarero@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.26.0"
+  }
+}
