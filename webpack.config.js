@@ -35,6 +35,7 @@ module.exports = {
         new webpack.ProvidePlugin({
             jQuery: 'jquery',
             $: 'jquery',
+            'window.jQuery': 'jquery'
         }),
         new CopyWebpackPlugin([
             // copies to {output}/static
