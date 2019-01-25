@@ -2,7 +2,7 @@
 
 {% block body %}
     <div class="row">
-        <div class="col-md-7 js-rep-log-table">
+        <div class="col-md-7 js-rep-log-table" data-rep-logs="{{ repLogsJson|e('html_attr') }}">
             <h2>
                 Lift History
             </h2>
