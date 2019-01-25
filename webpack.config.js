@@ -1,6 +1,24 @@
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const styleLoader = {
+    loader: 'style-loader',
+    options: {
+        sourceMap: true
+    }
+};
+const cssLoader = {
+    loader: 'css-loader',
+    options: {
+        sourceMap: true
+    }
+};
+const sassLoader = {
+    loader: 'sass-loader',
+    options: {
+        sourceMap: true
+    }
+};
 
 module.exports = {
     entry: {
@@ -23,6 +41,7 @@ module.exports = {
             { from: './assets/static', to: 'static'}
         ])
     ],
+    devtool: 'inline-source-map',
     module: {
         rules: [
             {
@@ -38,16 +57,16 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [
-                    'style-loader',
-                    'css-loader'
+                    styleLoader,
+                    cssLoader
                 ]
             },
             {
                 test: /\.scss$/,
                 use: [
-                    'style-loader',
-                    'css-loader',
-                    'sass-loader'
+                    styleLoader,
+                    cssLoader,
+                    sassLoader
                 ]
             },
             {
