@@ -103,5 +103,8 @@ module.exports = {
                 ]
             }
         ]
+    },
+    devServer: {
+        contentBase: './web'
     }
 };
