@@ -1,6 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const useDevServer = true;
+const publicPath = useDevServer ? 'http://localhost:8080/build/' : '/build/';
 const styleLoader = {
     loader: 'style-loader',
     options: {
@@ -29,7 +31,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'web', 'build'),
         filename: '[name].js',
-        publicPath: '/build/'
+        publicPath: publicPath
     },
     plugins: [
         new webpack.ProvidePlugin({
@@ -105,6 +107,7 @@ module.exports = {
         ]
     },
     devServer: {
-        contentBase: './web'
+        contentBase: './web',
+        headers: { 'Access-Control-Allow-Origin': '*' },
     }
 };
