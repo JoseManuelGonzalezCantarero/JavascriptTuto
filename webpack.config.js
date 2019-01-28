@@ -40,7 +40,13 @@ module.exports = {
         new CopyWebpackPlugin([
             // copies to {output}/static
             { from: './assets/static', to: 'static'}
-        ])
+        ]),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'vendor',
+            minChunks: function (module) {
+                return module.context && module.context.indexOf("node_modules") !== -1;
+            }
+        })
     ],
     devtool: 'inline-source-map',
     module: {
