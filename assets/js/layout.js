@@ -1,9 +1,9 @@
 'use strict';
 
-require('bootstrap-sass');
+import 'bootstrap-sass';
 // make sure the polyfill library is loaded in this main entry
-require('babel-polyfill');
-require('../css/main.scss');
+import 'babel-polyfill';
+import '../css/main.scss';
 
 $(document).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();

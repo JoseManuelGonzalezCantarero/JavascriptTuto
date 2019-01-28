@@ -1,6 +1,6 @@
-const $ = require('jquery');
-require('bootstrap-sass');
-const RepLogApp = require('./Components/RepLogApp');
+import $ from 'jquery';
+import 'bootstrap-sass';
+import RepLogApp from './Components/RepLogApp';
 
 // expose $ globally so I can use it in the template
 // ... even though I should put all my code here!

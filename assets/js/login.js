@@ -1,6 +1,6 @@
 'use strict';
 
-require('../css/login.css');
+import '../css/login.css';
 
 $(document).ready(function() {
     $('.js-recommended-login').on('click', '.js-show-login', function(e) {
