@@ -28,6 +28,7 @@
     "style-loader": "^0.23.1",
     "sweetalert2": "6.6.6",
     "webpack": "3",
-    "webpack-dev-server": "2"
+    "webpack-dev-server": "2",
+    "webpack-manifest-plugin": "^2.0.4"
   }
 }
