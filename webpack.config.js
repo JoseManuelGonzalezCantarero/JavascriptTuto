@@ -4,16 +4,19 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const useDevServer = false;
 const publicPath = useDevServer ? 'http://localhost:8080/build/' : '/build/';
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const isProduction = process.env.NODE_ENV === 'production';
+const useSourcemaps = !isProduction;
+
 const styleLoader = {
     loader: 'style-loader',
     options: {
-        sourceMap: true
+        sourceMap: useSourcemaps
     }
 };
 const cssLoader = {
     loader: 'css-loader',
     options: {
-        sourceMap: true
+        sourceMap: useSourcemaps
     }
 };
 const sassLoader = {
@@ -56,7 +59,7 @@ const webpackConfig = {
         }),
         new ExtractTextPlugin('[name].css')
     ],
-    devtool: 'inline-source-map',
+    devtool: useSourcemaps ? 'inline-source-map' : false,
     module: {
         rules: [
             {
@@ -119,9 +122,24 @@ const webpackConfig = {
     }
 };
 
-if (process.env.NODE_ENV === 'production') {
+if (isProduction) {
     webpackConfig.plugins.push(
         new webpack.optimize.UglifyJsPlugin()
+    );
+
+    // passes these options to all loaders
+    // but we should really pass these ourselves
+    webpackConfig.plugins.push(
+        new webpack.LoaderOptionsPlugin({
+            minimize: true,
+            debug: false
+        })
+    );
+
+    webpackConfig.plugins.push(
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify('production')
+        })
     );
 }
 
