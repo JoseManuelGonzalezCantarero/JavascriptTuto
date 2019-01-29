@@ -5,6 +5,11 @@
   "repository": "https://github.com/JoseManuelGonzalezCantarero/JavascriptTuto.git",
   "author": "Manu <jgonzalezcantarero@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "dev": "NODE_ENV=dev webpack",
+    "watch": "NODE_ENV=dev webpack --watch",
+    "production": "NODE_ENV=production webpack"
+  },
   "devDependencies": {
     "babel-core": "6.26.3",
     "babel-loader": "7",
