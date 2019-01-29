@@ -15,8 +15,11 @@ $(document).ready(function() {
         $('.login-long-username-warning').remove();
 
         if ($usernameInput.val().length >= 20) {
-            const $warning = $('<div class="login-long-username-warning">This is a really long username - are you sure that is right?</div>');
-            $usernameInput.before($warning);
+            // use code splitting to lazily load this "chunk"
+            import('./Components/username_validation_error').then(username_validation_error => {
+                console.log(username_validation_error);
+                username_validation_error.default($usernameInput);
+            });
         }
     });
 });
